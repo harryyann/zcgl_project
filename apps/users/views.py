@@ -102,7 +102,7 @@ class UserAddView(LoginRequiredMixin, View):
     def post(self, request):
         userinfo_form = UserInfoForm(request.POST)
         if userinfo_form.is_valid():
-            username = request.POST.get('username').strip()
+            username = request.POST.get('username').strip()  # 去除首尾空格
             staff_no = request.POST.get('staff_no').strip()
             department = request.POST.get('department').strip()
             bg_telephone = request.POST.get('bg_telephone').strip()

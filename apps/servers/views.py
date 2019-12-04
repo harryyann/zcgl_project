@@ -1,4 +1,6 @@
 # from django.contrib.auth.models import User
+import time
+
 from django.shortcuts import render
 from django.views.generic.base import View
 from django.http.response import HttpResponseRedirect, HttpResponse
@@ -65,7 +67,8 @@ class ServerAddView(LoginRequiredMixin, View):
         server_form = ServerForm()
         users = UserProfile.objects.filter(is_superuser=0, is_staff='1')
         server_types = ServerType.objects.all()
-        return render(request, 'servers/server_add.html', {'users': users, 'server_types': server_types, 'server_form':server_form})
+        return render(request, 'servers/server_add.html', {'users': users, 'server_types': server_types, 'server_form':
+            server_form})
 
     def post(self, request):
         zctype = ServerType.objects.get(pk=request.POST.get('zctype'))
@@ -201,7 +204,7 @@ class ServerExportView(LoginRequiredMixin, View):
                                  'zcpz', 'owner__username', 'undernet', 'guartime', 'comment')
         colnames = ['序号', '资产类型', 'IP地址', '功能描述', '设备品牌', '设备型号', '设备序号', '设备配置',
                     '管理人员', '所在网络', '保修期', '备注']
-        response = create_excel(colnames, servers, 'zcgl')
+        response = create_excel(colnames, servers, 'resources_management_table' + str(time.time()))  # 注意，表名不能用中文
         return response
 
 
@@ -211,9 +214,9 @@ def create_excel(columns, content, file_name):
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename=' + file_name
     response.charset = 'gbk'
-    writer = csv.writer(response)
+    writer = csv.writer(response)  # 使用python中的csv模块的writer函数，将构造的response写入
     writer.writerow(columns)
-    for i in content:
+    for i in content:  # 逐个写入字段中
         writer.writerow([i['id'], i['zctype__zctype'], i['ipaddress'], i['description'], i['brand'], i['zcmodel'],
                          i['zcnumber'], i['zcpz'], i['owner__username'], i['undernet'], i['guartime'], i['comment']])
     return response
